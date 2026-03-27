@@ -1,24 +1,26 @@
-name: Build DIY F401 Firmware
-on: [push, workflow_dispatch] # Build mỗi khi bạn chỉnh code hoặc nhấn nút chạy tay
+name: DIY-F401-Build
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Docker
-        run: docker pull betaflight/docker-build
+      - name: Install ARM Toolchain
+        uses: gcc-arm-embedded/setup-arm-embedded-action@v1
+        with:
+          arm-gcc-version: '10-2020-q4' # Bản ổn định nhất cho F4 đời cũ
 
-      - name: Build Firmware for F401
+      - name: Make Firmware for F401
         run: |
-          # Lệnh này sẽ build target MATEKF411 nhưng tối ưu cho F401
-          docker run --rm -v `pwd`:/opt/betaflight betaflight/docker-build make TARGET=MATEKF411
-
-      - name: Upload Artifact
+          # Dùng target MATEKF411 vì nó nhẹ và khớp F401
+          make TARGET=MATEKF411 EXTRA_FLAGS="-DSTM32F401xC" 
+          
+      - name: Upload Hex File
         uses: actions/upload-artifact@v4
         with:
-          name: DIY-F401-Firmware
+          name: Betaflight-F401RC-DIY
           path: obj/*.hex
           
