@@ -1,0 +1,24 @@
+name: Build DIY F401 Firmware
+on: [push, workflow_dispatch] # Build mỗi khi bạn chỉnh code hoặc nhấn nút chạy tay
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Docker
+        run: docker pull betaflight/docker-build
+
+      - name: Build Firmware for F401
+        run: |
+          # Lệnh này sẽ build target MATEKF411 nhưng tối ưu cho F401
+          docker run --rm -v `pwd`:/opt/betaflight betaflight/docker-build make TARGET=MATEKF411
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DIY-F401-Firmware
+          path: obj/*.hex
+          
