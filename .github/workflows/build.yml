@@ -1,4 +1,4 @@
-name: DIY-F401-Build
+name: DIY-F401-Build-Final
 on: [push, workflow_dispatch]
 
 jobs:
@@ -8,15 +8,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install ARM Toolchain
-        uses: gcc-arm-embedded/setup-arm-embedded-action@v1
-        with:
-          arm-gcc-version: '10-2020-q4' # Bản ổn định nhất cho F4 đời cũ
+      - name: Install ARM Compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi make
 
       - name: Make Firmware for F401
         run: |
-          # Dùng target MATEKF411 vì nó nhẹ và khớp F401
-          make TARGET=MATEKF411 EXTRA_FLAGS="-DSTM32F401xC" 
+          # Dùng target MATEKF411 vì nó là "khung" chuẩn nhất cho F401/F411
+          make TARGET=MATEKF411
           
       - name: Upload Hex File
         uses: actions/upload-artifact@v4
